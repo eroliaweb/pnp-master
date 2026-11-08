@@ -7,6 +7,7 @@ import {
   ZoomOut,
 } from 'lucide-react';
 import React, { useState } from 'react';
+import { useI18n } from '../i18n/LanguageContext';
 import type {
   BleedConfig,
   CutMarksConfig,
@@ -29,6 +30,7 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
   cutMarks,
   bleedConfig,
 }) => {
+  const { t } = useI18n();
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [hoveredCardSlot, setHoveredCardSlot] = useState<number | null>(null);
@@ -36,7 +38,7 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
   if (pages.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center bg-slate-950 text-slate-500 text-sm">
-        Görüntülenecek sayfa bulunamadı. Lütfen kart ekleyin.
+        {t('noPages')}
       </div>
     );
   }
@@ -70,15 +72,15 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
           <button
             onClick={() => setCurrentPageIndex((p) => Math.max(0, p - 1))}
             disabled={safePageIndex === 0}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Önceki Sayfa"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            title={t('prevPage')}
           >
             <ChevronLeft className="w-4 h-4" />
           </button>
 
           <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-950 rounded-lg border border-slate-800 text-xs">
             <span className="font-semibold text-white">
-              Sayfa {safePageIndex + 1} / {pages.length}
+              {t('pageLabel')} {safePageIndex + 1} / {pages.length}
             </span>
             <span className="text-slate-500">|</span>
             <span
@@ -88,29 +90,29 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
                   : 'bg-indigo-950 text-indigo-300 border border-indigo-800/50'
               }`}
             >
-              {currentPage.isBackPage ? 'ARKA YÜZ (AYNALI)' : 'ÖN YÜZ'}
+              {currentPage.isBackPage ? t('backFaceMirrored') : t('frontFace')}
             </span>
             <span className="text-slate-500 text-[10px] hidden sm:inline">
-              (Yaprak {currentSheetNum}/{totalSheets})
+              ({t('sheetsCount')} {currentSheetNum}/{totalSheets})
             </span>
           </div>
 
           <button
             onClick={() => setCurrentPageIndex((p) => Math.min(pages.length - 1, p + 1))}
             disabled={safePageIndex === pages.length - 1}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
-            title="Sonraki Sayfa"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+            title={t('nextPage')}
           >
             <ChevronRight className="w-4 h-4" />
           </button>
 
           <button
             onClick={handleToggleFlip}
-            className="ml-2 flex items-center gap-1.5 px-2.5 py-1 bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-800/50 rounded-lg text-xs font-medium transition"
-            title="Sayfanın arkasını çevir ve hizalamayı kontrol et"
+            className="ml-2 flex items-center gap-1.5 px-2.5 py-1 bg-indigo-950/60 hover:bg-indigo-900/60 text-indigo-300 border border-indigo-800/50 rounded-lg text-xs font-medium transition cursor-pointer"
+            title={t('flipSheetTooltip')}
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden md:inline">Sayfayı Çevir</span>
+            <span className="hidden md:inline">{t('flipSheet')}</span>
           </button>
         </div>
 
@@ -118,7 +120,7 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
         <div className="hidden lg:flex items-center gap-2 text-xs text-slate-400">
           <Info className="w-3.5 h-3.5 text-indigo-400" />
           <span>
-            {layout.cols} Sütun × {layout.rows} Satır = <strong>{layout.cardsPerPage} Kart / Sayfa</strong>
+            {layout.cols} × {layout.rows} = <strong>{layout.cardsPerPage} {t('cardsPerSheet')}</strong>
           </span>
           <span className="text-slate-600">•</span>
           <span>{paperW} × {paperH} mm</span>
@@ -128,8 +130,8 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
         <div className="flex items-center gap-1.5">
           <button
             onClick={() => setZoomLevel((z) => Math.max(0.4, z - 0.15))}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
-            title="Uzaklaş"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
+            title={t('zoomOut')}
           >
             <ZoomOut className="w-3.5 h-3.5" />
           </button>
@@ -138,15 +140,15 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
           </span>
           <button
             onClick={() => setZoomLevel((z) => Math.min(2.5, z + 0.15))}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
-            title="Yakınlaş"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
+            title={t('zoomIn')}
           >
             <ZoomIn className="w-3.5 h-3.5" />
           </button>
           <button
             onClick={() => setZoomLevel(1)}
-            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono px-2"
-            title="Varsayılan Boyut"
+            className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[10px] font-mono px-2 cursor-pointer"
+            title={t('defaultZoom')}
           >
             100%
           </button>
@@ -187,7 +189,7 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
                 ].map((pos, i) => (
                   <g key={i}>
                     <line x1={pos.x - 3} y1={pos.y} x2={pos.x + 3} y2={pos.y} />
-                    <line x1={pos.x} y1={pos.y - 3} x2={pos.x} y2={pos.y + 3} />
+                    <line x1={pos.x} y1={pos.y - 3} x2={pos.x + 3} y2={pos.y} />
                     <circle cx={pos.x} cy={pos.y} r="2" />
                   </g>
                 ))}
@@ -203,8 +205,8 @@ export const SheetPreview: React.FC<SheetPreviewProps> = ({
               fill="#94a3b8"
               fontFamily="monospace"
             >
-              PNPMaster — Yaprak {currentSheetNum} / {totalSheets} [
-              {currentPage.isBackPage ? 'ARKA YÜZ - DUPLEX MIRRORED' : 'ÖN YÜZ'}] — {paperW}x{paperH}mm
+              PNPMaster — {t('sheetsCount')} {currentSheetNum} / {totalSheets} [
+              {currentPage.isBackPage ? t('backFaceMirrored') : t('frontFace')}] — {paperW}x{paperH}mm
             </text>
 
             {/* Placed Cards */}

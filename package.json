@@ -10,7 +10,33 @@
     "lint": "oxlint",
     "preview": "vite preview",
     "dev:electron": "concurrently \"vite\" \"wait-on tcp:5173 && cross-env NODE_ENV=development electron .\"",
-    "start": "npm run build && electron ."
+    "start": "npm run build && electron .",
+    "build:exe": "npm run build && electron-builder --win"
+  },
+  "build": {
+    "appId": "com.pnpmaster.app",
+    "productName": "PNPMaster",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "electron/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "portable": {
+      "artifactName": "PNPMaster.exe"
+    }
   },
   "dependencies": {
     "file-saver": "^2.0.5",
@@ -29,6 +55,7 @@
     "concurrently": "^10.0.7",
     "cross-env": "^10.1.0",
     "electron": "^45.2.3",
+    "electron-builder": "^26.18.0",
     "oxlint": "^1.90.0",
     "tailwindcss": "^4.3.5",
     "typescript": "~7.0.2",

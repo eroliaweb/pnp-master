@@ -6,6 +6,7 @@ import { ExportModal } from './components/ExportModal';
 import { Header } from './components/Header';
 import { SheetPreview } from './components/SheetPreview';
 import { SidebarSettings } from './components/SidebarSettings';
+import { LanguageProvider, useI18n } from './i18n/LanguageContext';
 import type {
   BackMode,
   BleedConfig,
@@ -15,10 +16,10 @@ import type {
   Orientation,
 } from './types/pnp';
 import {
-  CARD_PRESETS,
   DEFAULT_CUT_MARKS,
   DEFAULT_MARGINS,
-  PAPER_PRESETS,
+  getCardPresets,
+  getPaperPresets,
 } from './utils/constants';
 import { calculateLayout, generatePages } from './utils/layoutCalculator';
 import type { FlipEdge } from './utils/layoutCalculator';
@@ -31,7 +32,9 @@ import {
 
 type MainViewMode = 'deck' | 'preview' | 'split';
 
-export const App: React.FC = () => {
+const AppContent: React.FC = () => {
+  const { language, t } = useI18n();
+
   // Paper State
   const [selectedPaperPreset, setSelectedPaperPreset] = useState<string>('a4');
   const [customPaperWidth, setCustomPaperWidth] = useState<number>(210);
@@ -64,23 +67,26 @@ export const App: React.FC = () => {
   const [isExporting, setIsExporting] = useState(false);
   const [exportProgress, setExportProgress] = useState({ current: 0, total: 0, message: '' });
 
+  const paperPresets = useMemo(() => getPaperPresets(language), [language]);
+  const cardPresets = useMemo(() => getCardPresets(language), [language]);
+
   // Resolve active paper dimensions
   const activePaperDimensions = useMemo(() => {
     if (selectedPaperPreset === 'custom') {
       return { width: customPaperWidth, height: customPaperHeight };
     }
-    const preset = PAPER_PRESETS.find((p) => p.id === selectedPaperPreset) || PAPER_PRESETS[0];
+    const preset = paperPresets.find((p) => p.id === selectedPaperPreset) || paperPresets[0];
     return { width: preset.widthMm, height: preset.heightMm };
-  }, [selectedPaperPreset, customPaperWidth, customPaperHeight]);
+  }, [selectedPaperPreset, customPaperWidth, customPaperHeight, paperPresets]);
 
   // Resolve active card dimensions
   const activeCardDimensions = useMemo(() => {
     if (selectedCardPreset === 'custom') {
       return { width: customCardWidth, height: customCardHeight };
     }
-    const preset = CARD_PRESETS.find((c) => c.id === selectedCardPreset) || CARD_PRESETS[0];
+    const preset = cardPresets.find((c) => c.id === selectedCardPreset) || cardPresets[0];
     return { width: preset.widthMm, height: preset.heightMm };
-  }, [selectedCardPreset, customCardWidth, customCardHeight]);
+  }, [selectedCardPreset, customCardWidth, customCardHeight, cardPresets]);
 
   // Total flattened cards count
   const totalCardsCount = useMemo(() => {
@@ -221,7 +227,7 @@ export const App: React.FC = () => {
   };
 
   const handleClearCards = () => {
-    if (window.confirm('Tüm kartlar silinecek. Emin misiniz?')) {
+    if (window.confirm(t('confirmClear'))) {
       setCards([]);
     }
   };
@@ -229,7 +235,7 @@ export const App: React.FC = () => {
   // PDF Export
   const handleStartExport = async (scope: ExportScope) => {
     setIsExporting(true);
-    setExportProgress({ current: 0, total: pages.length, message: 'Başlatılıyor...' });
+    setExportProgress({ current: 0, total: pages.length, message: t('preparingPdf') });
 
     try {
       const pdfBytes = await generatePnpPdf(
@@ -249,7 +255,7 @@ export const App: React.FC = () => {
       setIsExportModalOpen(false);
     } catch (error) {
       console.error('PDF export failed:', error);
-      alert('PDF oluşturulurken bir hata oluştu: ' + String(error));
+      alert('PDF Error: ' + String(error));
     } finally {
       setIsExporting(false);
     }
@@ -317,42 +323,42 @@ export const App: React.FC = () => {
             <div className="flex items-center gap-1 bg-slate-900 p-0.5 rounded-lg border border-slate-800 text-xs">
               <button
                 onClick={() => setViewMode('deck')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition cursor-pointer ${
                   viewMode === 'deck'
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <CreditCard className="w-3.5 h-3.5" />
-                <span>Kart Galerisi</span>
+                <span>{t('deckView')}</span>
               </button>
               <button
                 onClick={() => setViewMode('preview')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition ${
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition cursor-pointer ${
                   viewMode === 'preview'
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <Eye className="w-3.5 h-3.5" />
-                <span>Sayfa Baskı Önizleme</span>
+                <span>{t('previewView')}</span>
               </button>
               <button
                 onClick={() => setViewMode('split')}
-                className={`hidden md:flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition ${
+                className={`hidden md:flex items-center gap-1.5 px-3 py-1 rounded-md font-medium transition cursor-pointer ${
                   viewMode === 'split'
                     ? 'bg-indigo-600 text-white shadow-sm'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 <LayoutGrid className="w-3.5 h-3.5" />
-                <span>Bölünmüş Görünüm</span>
+                <span>{t('splitView')}</span>
               </button>
             </div>
 
             <div className="text-xs text-slate-400 font-mono">
-              <span className="text-indigo-400 font-semibold">{layout.cols}×{layout.rows}</span> ızgara •{' '}
-              <span className="text-white">{layout.cardWidthMm}×{layout.cardHeightMm}mm</span> kart
+              <span className="text-indigo-400 font-semibold">{layout.cols}×{layout.rows}</span> {t('gridInfo')} •{' '}
+              <span className="text-white">{layout.cardWidthMm}×{layout.cardHeightMm}mm</span> {t('cardInfo')}
             </div>
           </div>
 
@@ -405,6 +411,14 @@ export const App: React.FC = () => {
         onStartExport={handleStartExport}
       />
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <LanguageProvider>
+      <AppContent />
+    </LanguageProvider>
   );
 };
 

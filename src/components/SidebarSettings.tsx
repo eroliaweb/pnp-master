@@ -7,6 +7,7 @@ import {
   Upload,
 } from 'lucide-react';
 import React, { useState } from 'react';
+import { useI18n } from '../i18n/LanguageContext';
 import type {
   BackMode,
   BleedConfig,
@@ -14,7 +15,7 @@ import type {
   Margins,
   Orientation,
 } from '../types/pnp';
-import { CARD_PRESETS, PAPER_PRESETS } from '../utils/constants';
+import { getCardPresets, getPaperPresets } from '../utils/constants';
 import type { FlipEdge } from '../utils/layoutCalculator';
 
 interface SidebarSettingsProps {
@@ -81,7 +82,11 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
   onSingleBackImageChange,
   onBatchBackImagesUpload,
 }) => {
+  const { language, t } = useI18n();
   const [activeTab, setActiveTab] = useState<'paper' | 'card' | 'cut' | 'back'>('paper');
+
+  const paperPresets = getPaperPresets(language);
+  const cardPresets = getCardPresets(language);
 
   return (
     <aside className="w-84 border-r border-slate-800 bg-slate-900/60 flex flex-col shrink-0 overflow-hidden">
@@ -89,47 +94,47 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
       <div className="grid grid-cols-4 p-2 gap-1 border-b border-slate-800/80 bg-slate-950/40 text-xs">
         <button
           onClick={() => setActiveTab('paper')}
-          className={`flex flex-col items-center py-2 px-1 rounded-lg font-medium transition ${
+          className={`flex flex-col items-center py-2 px-1 rounded-lg font-medium transition cursor-pointer ${
             activeTab === 'paper'
               ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
           }`}
         >
           <FileBox className="w-4 h-4 mb-1" />
-          <span>Kağıt</span>
+          <span>{t('tabPaper')}</span>
         </button>
         <button
           onClick={() => setActiveTab('card')}
-          className={`flex flex-col items-center py-2 px-1 rounded-lg font-medium transition ${
+          className={`flex flex-col items-center py-2 px-1 rounded-lg font-medium transition cursor-pointer ${
             activeTab === 'card'
               ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
           }`}
         >
           <CreditCard className="w-4 h-4 mb-1" />
-          <span>Kart</span>
+          <span>{t('tabCard')}</span>
         </button>
         <button
           onClick={() => setActiveTab('cut')}
-          className={`flex flex-col items-center py-2 px-1 rounded-lg font-medium transition ${
+          className={`flex flex-col items-center py-2 px-1 rounded-lg font-medium transition cursor-pointer ${
             activeTab === 'cut'
               ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
           }`}
         >
           <Crop className="w-4 h-4 mb-1" />
-          <span>Kesim</span>
+          <span>{t('tabCut')}</span>
         </button>
         <button
           onClick={() => setActiveTab('back')}
-          className={`flex flex-col items-center py-2 px-1 rounded-lg font-medium transition ${
+          className={`flex flex-col items-center py-2 px-1 rounded-lg font-medium transition cursor-pointer ${
             activeTab === 'back'
               ? 'bg-indigo-600/20 text-indigo-400 border border-indigo-500/30'
               : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
           }`}
         >
           <ImageIcon className="w-4 h-4 mb-1" />
-          <span>Arka Yüz</span>
+          <span>{t('tabBack')}</span>
         </button>
       </div>
 
@@ -140,15 +145,15 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-slate-300 font-semibold mb-1.5 flex items-center justify-between">
-                <span>Kağıt Formatı</span>
-                <span className="text-[10px] text-slate-500 uppercase font-mono">Baskı Kağıdı</span>
+                <span>{t('paperFormat')}</span>
+                <span className="text-[10px] text-slate-500 uppercase font-mono">{t('printPaper')}</span>
               </label>
               <select
                 value={selectedPaperPreset}
                 onChange={(e) => onPaperPresetChange(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition text-xs"
               >
-                {PAPER_PRESETS.map((p) => (
+                {paperPresets.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
@@ -159,10 +164,10 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
             {/* Custom dimensions if custom selected */}
             {selectedPaperPreset === 'custom' && (
               <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-lg space-y-2">
-                <span className="text-[11px] font-semibold text-indigo-300 block">Özel Kağıt Ölçüleri (mm)</span>
+                <span className="text-[11px] font-semibold text-indigo-300 block">{t('customPaperSize')}</span>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-1">Genişlik (mm)</label>
+                    <label className="text-[10px] text-slate-400 block mb-1">{t('widthMm')}</label>
                     <input
                       type="number"
                       min={50}
@@ -173,7 +178,7 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-1">Yükseklik (mm)</label>
+                    <label className="text-[10px] text-slate-400 block mb-1">{t('heightMm')}</label>
                     <input
                       type="number"
                       min={50}
@@ -189,29 +194,29 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
 
             {/* Orientation */}
             <div>
-              <label className="block text-slate-300 font-semibold mb-1.5">Kağıt Yönlendirmesi</label>
+              <label className="block text-slate-300 font-semibold mb-1.5">{t('paperOrientation')}</label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => onOrientationChange('portrait')}
-                  className={`py-2 px-3 rounded-lg border text-center transition flex items-center justify-center gap-2 ${
+                  className={`py-2 px-3 rounded-lg border text-center transition flex items-center justify-center gap-2 cursor-pointer ${
                     orientation === 'portrait'
                       ? 'bg-indigo-600/20 border-indigo-500 text-white font-semibold'
                       : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white'
                   }`}
                 >
                   <div className="w-3.5 h-4.5 border border-current rounded-xs" />
-                  <span>Dikey</span>
+                  <span>{t('portrait')}</span>
                 </button>
                 <button
                   onClick={() => onOrientationChange('landscape')}
-                  className={`py-2 px-3 rounded-lg border text-center transition flex items-center justify-center gap-2 ${
+                  className={`py-2 px-3 rounded-lg border text-center transition flex items-center justify-center gap-2 cursor-pointer ${
                     orientation === 'landscape'
                       ? 'bg-indigo-600/20 border-indigo-500 text-white font-semibold'
                       : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white'
                   }`}
                 >
                   <div className="w-4.5 h-3.5 border border-current rounded-xs" />
-                  <span>Yatay</span>
+                  <span>{t('landscape')}</span>
                 </button>
               </div>
             </div>
@@ -219,17 +224,17 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
             {/* Margins */}
             <div>
               <label className="block text-slate-300 font-semibold mb-1.5 flex items-center justify-between">
-                <span>Kenar Boşlukları (Margin - mm)</span>
+                <span>{t('margins')}</span>
                 <button
                   onClick={() => onMarginsChange({ top: 10, bottom: 10, left: 10, right: 10 })}
-                  className="text-[10px] text-indigo-400 hover:underline"
+                  className="text-[10px] text-indigo-400 hover:underline cursor-pointer"
                 >
-                  Varsayılan (10mm)
+                  {t('defaultMargin')}
                 </button>
               </label>
               <div className="grid grid-cols-2 gap-2 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800">
                 <div>
-                  <label className="text-[10px] text-slate-400 block">Üst (mm)</label>
+                  <label className="text-[10px] text-slate-400 block">{t('marginTop')}</label>
                   <input
                     type="number"
                     min={0}
@@ -240,7 +245,7 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-slate-400 block">Alt (mm)</label>
+                  <label className="text-[10px] text-slate-400 block">{t('marginBottom')}</label>
                   <input
                     type="number"
                     min={0}
@@ -251,7 +256,7 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-slate-400 block">Sol (mm)</label>
+                  <label className="text-[10px] text-slate-400 block">{t('marginLeft')}</label>
                   <input
                     type="number"
                     min={0}
@@ -262,7 +267,7 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-slate-400 block">Sağ (mm)</label>
+                  <label className="text-[10px] text-slate-400 block">{t('marginRight')}</label>
                   <input
                     type="number"
                     min={0}
@@ -282,15 +287,15 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
           <div className="space-y-4">
             <div>
               <label className="block text-slate-300 font-semibold mb-1.5 flex items-center justify-between">
-                <span>Kart Ölçü Standartı</span>
-                <span className="text-[10px] text-slate-500 uppercase font-mono">PnP Kart</span>
+                <span>{t('cardStandard')}</span>
+                <span className="text-[10px] text-slate-500 uppercase font-mono">{t('pnpCard')}</span>
               </label>
               <select
                 value={selectedCardPreset}
                 onChange={(e) => onCardPresetChange(e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700/80 rounded-lg px-3 py-2 text-white focus:outline-none focus:border-indigo-500 transition text-xs"
               >
-                {CARD_PRESETS.map((c) => (
+                {cardPresets.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
                   </option>
@@ -301,10 +306,10 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
             {/* Custom Card dimensions */}
             {selectedCardPreset === 'custom' && (
               <div className="p-3 bg-slate-950/70 border border-slate-800 rounded-lg space-y-2">
-                <span className="text-[11px] font-semibold text-indigo-300 block">Özel Kart Ölçüleri (mm)</span>
+                <span className="text-[11px] font-semibold text-indigo-300 block">{t('customCardSize')}</span>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-1">Genişlik (mm)</label>
+                    <label className="text-[10px] text-slate-400 block mb-1">{t('widthMm')}</label>
                     <input
                       type="number"
                       step={0.5}
@@ -316,7 +321,7 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] text-slate-400 block mb-1">Yükseklik (mm)</label>
+                    <label className="text-[10px] text-slate-400 block mb-1">{t('heightMm')}</label>
                     <input
                       type="number"
                       step={0.5}
@@ -334,17 +339,17 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
             {/* Spacing between cards */}
             <div>
               <label className="block text-slate-300 font-semibold mb-1.5 flex items-center justify-between">
-                <span>Kartlar Arası Aralık (Gutter)</span>
+                <span>{t('cardSpacing')}</span>
                 <button
                   onClick={() => onSpacingChange(0, 0)}
-                  className="text-[10px] text-indigo-400 hover:underline"
+                  className="text-[10px] text-indigo-400 hover:underline cursor-pointer"
                 >
-                  Sıfır Kesim (0mm)
+                  {t('zeroGutter')}
                 </button>
               </label>
               <div className="grid grid-cols-2 gap-2 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800">
                 <div>
-                  <label className="text-[10px] text-slate-400 block">Yatay Aralık (mm)</label>
+                  <label className="text-[10px] text-slate-400 block">{t('spacingX')}</label>
                   <input
                     type="number"
                     min={0}
@@ -356,7 +361,7 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-slate-400 block">Dikey Aralık (mm)</label>
+                  <label className="text-[10px] text-slate-400 block">{t('spacingY')}</label>
                   <input
                     type="number"
                     min={0}
@@ -368,14 +373,12 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   />
                 </div>
               </div>
-              <p className="text-[10px] text-slate-500 mt-1">
-                İpucu: 0mm bitişik kesimde tek bir bıçak darbesiyle iki kart kesilebilir.
-              </p>
+              <p className="text-[10px] text-slate-500 mt-1">{t('gutterTip')}</p>
             </div>
 
             {/* Bleed Settings */}
             <div>
-              <label className="block text-slate-300 font-semibold mb-1.5">Taşma Payı (Bleed - mm)</label>
+              <label className="block text-slate-300 font-semibold mb-1.5">{t('bleedLabel')}</label>
               <div className="flex items-center gap-3 bg-slate-950/50 p-2.5 rounded-lg border border-slate-800">
                 <input
                   type="number"
@@ -387,7 +390,9 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   className="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white"
                 />
                 <span className="text-[11px] text-slate-400">
-                  {bleedConfig.bleedMm > 0 ? `Her kenardan +${bleedConfig.bleedMm}mm taşma` : 'Taşma yok (0mm)'}
+                  {bleedConfig.bleedMm > 0
+                    ? t('bleedDesc', { val: bleedConfig.bleedMm })
+                    : t('bleedNone')}
                 </span>
               </div>
             </div>
@@ -401,33 +406,31 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
             <div className="p-3 bg-indigo-950/20 border border-indigo-900/40 rounded-lg space-y-2">
               <div className="flex items-center gap-1.5 text-indigo-300 font-semibold">
                 <RotateCw className="w-4 h-4" />
-                <span>Çift Taraflı Baskı (Duplex Aynalama)</span>
+                <span>{t('duplexTitle')}</span>
               </div>
-              <p className="text-[10px] text-slate-400 leading-relaxed">
-                Yazıcı çift taraflı bastığında arka yüzdeki kartların tam ön yüzle çakışması için ayna çevirme ekseni:
-              </p>
+              <p className="text-[10px] text-slate-400 leading-relaxed">{t('duplexDesc')}</p>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <button
                   onClick={() => onFlipEdgeChange('long-edge')}
-                  className={`py-2 px-2.5 rounded border text-left transition ${
+                  className={`py-2 px-2.5 rounded border text-left transition cursor-pointer ${
                     flipEdge === 'long-edge'
                       ? 'bg-indigo-600/30 border-indigo-500 text-white font-medium'
                       : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <span className="block font-semibold text-[11px]">Uzun Kenar (Kitap)</span>
-                  <span className="text-[9px] text-slate-400 block mt-0.5">Yatay ayna (Standard)</span>
+                  <span className="block font-semibold text-[11px]">{t('flipLongEdge')}</span>
+                  <span className="text-[9px] text-slate-400 block mt-0.5">{t('flipLongEdgeSub')}</span>
                 </button>
                 <button
                   onClick={() => onFlipEdgeChange('short-edge')}
-                  className={`py-2 px-2.5 rounded border text-left transition ${
+                  className={`py-2 px-2.5 rounded border text-left transition cursor-pointer ${
                     flipEdge === 'short-edge'
                       ? 'bg-indigo-600/30 border-indigo-500 text-white font-medium'
                       : 'border-slate-800 bg-slate-900 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <span className="block font-semibold text-[11px]">Kısa Kenar (Takvim)</span>
-                  <span className="text-[9px] text-slate-400 block mt-0.5">Dikey ayna</span>
+                  <span className="block font-semibold text-[11px]">{t('flipShortEdge')}</span>
+                  <span className="text-[9px] text-slate-400 block mt-0.5">{t('flipShortEdgeSub')}</span>
                 </button>
               </div>
             </div>
@@ -439,15 +442,15 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   type="checkbox"
                   checked={cutMarks.showCropMarks}
                   onChange={(e) => onCutMarksChange({ ...cutMarks, showCropMarks: e.target.checked })}
-                  className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                  className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                 />
-                <span className="font-semibold text-slate-200">Köşe Kesim Kılavuzları (Crop Marks)</span>
+                <span className="font-semibold text-slate-200">{t('cropMarks')}</span>
               </label>
 
               {cutMarks.showCropMarks && (
                 <div className="ml-6 space-y-2 bg-slate-950/40 p-2.5 rounded-lg border border-slate-800">
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400 text-[11px]">Çizgi Uzunluğu:</span>
+                    <span className="text-slate-400 text-[11px]">{t('cropMarkLength')}</span>
                     <input
                       type="number"
                       min={2}
@@ -458,7 +461,7 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                     />
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-slate-400 text-[11px]">Karttan Ofset:</span>
+                    <span className="text-slate-400 text-[11px]">{t('cropMarkOffset')}</span>
                     <input
                       type="number"
                       min={0}
@@ -479,13 +482,11 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   type="checkbox"
                   checked={cutMarks.showGridLines}
                   onChange={(e) => onCutMarksChange({ ...cutMarks, showGridLines: e.target.checked })}
-                  className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                  className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                 />
-                <span className="font-semibold text-slate-200">Izgara Kesim Çizgileri</span>
+                <span className="font-semibold text-slate-200">{t('gridLines')}</span>
               </label>
-              <p className="text-[10px] text-slate-500 ml-6">
-                Kartların kenarlarını boyunca hafif kılavuz çizgisi çizer (giyotin hizalama için idealdir).
-              </p>
+              <p className="text-[10px] text-slate-500 ml-6">{t('gridLinesDesc')}</p>
             </div>
 
             {/* Registration marks */}
@@ -495,13 +496,11 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                   type="checkbox"
                   checked={cutMarks.showRegistrationMarks}
                   onChange={(e) => onCutMarksChange({ ...cutMarks, showRegistrationMarks: e.target.checked })}
-                  className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500"
+                  className="rounded border-slate-700 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
                 />
-                <span className="font-semibold text-slate-200">Hizalama Hedefleri (Registration Marks)</span>
+                <span className="font-semibold text-slate-200">{t('registrationMarks')}</span>
               </label>
-              <p className="text-[10px] text-slate-500 ml-6">
-                Sayfa köşelerine çift taraflı baskı kaymasını kontrol etmek için artı hedef işaretleri koyar.
-              </p>
+              <p className="text-[10px] text-slate-500 ml-6">{t('registrationMarksDesc')}</p>
             </div>
           </div>
         )}
@@ -510,29 +509,29 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
         {activeTab === 'back' && (
           <div className="space-y-4">
             <div>
-              <label className="block text-slate-300 font-semibold mb-1.5">Arka Yüz Modu</label>
+              <label className="block text-slate-300 font-semibold mb-1.5">{t('backModeLabel')}</label>
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => onBackModeChange('single')}
-                  className={`py-2 px-2.5 rounded-lg border text-left transition ${
+                  className={`py-2 px-2.5 rounded-lg border text-left transition cursor-pointer ${
                     backMode === 'single'
                       ? 'bg-indigo-600/20 border-indigo-500 text-white font-medium'
                       : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <span className="block font-semibold text-[11px]">Tekli Arka Yüz</span>
-                  <span className="text-[9px] text-slate-400 block mt-0.5">Tüm kartlara tek görsel</span>
+                  <span className="block font-semibold text-[11px]">{t('singleBack')}</span>
+                  <span className="text-[9px] text-slate-400 block mt-0.5">{t('singleBackSub')}</span>
                 </button>
                 <button
                   onClick={() => onBackModeChange('individual')}
-                  className={`py-2 px-2.5 rounded-lg border text-left transition ${
+                  className={`py-2 px-2.5 rounded-lg border text-left transition cursor-pointer ${
                     backMode === 'individual'
                       ? 'bg-indigo-600/20 border-indigo-500 text-white font-medium'
                       : 'border-slate-800 bg-slate-950/40 text-slate-400 hover:text-white'
                   }`}
                 >
-                  <span className="block font-semibold text-[11px]">Bireysel Arka Yüz</span>
-                  <span className="text-[9px] text-slate-400 block mt-0.5">Her karta özel arka</span>
+                  <span className="block font-semibold text-[11px]">{t('individualBack')}</span>
+                  <span className="text-[9px] text-slate-400 block mt-0.5">{t('individualBackSub')}</span>
                 </button>
               </div>
             </div>
@@ -540,69 +539,73 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
             {/* Single Back Image Upload/Preview */}
             {backMode === 'single' && (
               <div className="space-y-3 p-3 bg-slate-950/50 border border-slate-800 rounded-lg">
-                <span className="text-[11px] font-semibold text-slate-200 block">Deste Arka Görseli</span>
+                <span className="text-[11px] font-semibold text-slate-200 block">{t('deckBackImage')}</span>
                 {singleBackImage ? (
                   <div className="relative group rounded-lg overflow-hidden border border-slate-700 bg-slate-900 aspect-[5/7] max-w-[140px] mx-auto shadow-md">
                     <img src={singleBackImage} alt="Deck Back" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-slate-950/70 opacity-0 group-hover:opacity-100 transition flex flex-col items-center justify-center gap-2">
                       <label className="cursor-pointer px-2.5 py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] font-medium transition">
-                        Değiştir
+                        {t('changeImage')}
                         <input
                           type="file"
                           accept="image/*"
                           className="hidden"
                           onChange={(e) => {
                             if (e.target.files?.[0]) {
+                              const f = e.target.files[0];
+                              try {
+                                onSingleBackImageChange(URL.createObjectURL(f));
+                              } catch {}
                               const reader = new FileReader();
                               reader.onload = () => onSingleBackImageChange(reader.result as string);
-                              reader.readAsDataURL(e.target.files[0]);
+                              reader.readAsDataURL(f);
                             }
                           }}
                         />
                       </label>
                       <button
                         onClick={() => onSingleBackImageChange(null)}
-                        className="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-[10px] font-medium transition"
+                        className="px-2.5 py-1 bg-red-600 hover:bg-red-500 text-white rounded text-[10px] font-medium transition cursor-pointer"
                       >
-                        Kaldır
+                        {t('removeImage')}
                       </button>
                     </div>
                   </div>
                 ) : (
                   <label className="border-2 border-dashed border-slate-700 hover:border-indigo-500 rounded-lg p-5 flex flex-col items-center justify-center cursor-pointer transition bg-slate-900/40 hover:bg-slate-900/80">
                     <Upload className="w-6 h-6 text-indigo-400 mb-2" />
-                    <span className="font-medium text-slate-200 text-xs">Arka Görsel Seç</span>
-                    <span className="text-[10px] text-slate-500 mt-1">PNG, JPG, WebP</span>
+                    <span className="font-medium text-slate-200 text-xs">{t('selectBackImage')}</span>
+                    <span className="text-[10px] text-slate-500 mt-1">{t('imageFormats')}</span>
                     <input
                       type="file"
                       accept="image/*"
                       className="hidden"
                       onChange={(e) => {
                         if (e.target.files?.[0]) {
+                          const f = e.target.files[0];
+                          try {
+                            onSingleBackImageChange(URL.createObjectURL(f));
+                          } catch {}
                           const reader = new FileReader();
                           reader.onload = () => onSingleBackImageChange(reader.result as string);
-                          reader.readAsDataURL(e.target.files[0]);
+                          reader.readAsDataURL(f);
                         }
                       }}
                     />
                   </label>
                 )}
-                <p className="text-[10px] text-slate-400 text-center">
-                  Bu görsel baskıda arka sayfaların tüm hücrelerinde tekrarlanır.
-                </p>
+                <p className="text-[10px] text-slate-400 text-center">{t('singleBackNote')}</p>
               </div>
             )}
 
             {/* Individual Back Batch Upload */}
             {backMode === 'individual' && (
               <div className="space-y-3 p-3 bg-slate-950/50 border border-slate-800 rounded-lg">
-                <span className="text-[11px] font-semibold text-slate-200 block">Toplu Arka Yüz Yükleme</span>
-                <p className="text-[10px] text-slate-400">
-                  Birden fazla arka görsel seçtiğinizde, listedeki ön yüz kartlarına sıra ile eşleştirilir.
-                </p>
+                <span className="text-[11px] font-semibold text-slate-200 block">{t('batchBackUpload')}</span>
+                <p className="text-[10px] text-slate-400">{t('batchBackDesc')}</p>
                 <label className="border-2 border-dashed border-indigo-500/40 hover:border-indigo-400 rounded-lg p-4 flex flex-col items-center justify-center cursor-pointer transition bg-indigo-950/10 hover:bg-indigo-950/20">
                   <Upload className="w-5 h-5 text-indigo-400 mb-1" />
-                  <span className="font-medium text-indigo-300 text-xs">Çoklu Arka Görseller Seç</span>
+                  <span className="font-medium text-indigo-300 text-xs">{t('selectBatchBacks')}</span>
                   <input
                     type="file"
                     accept="image/*"
@@ -615,9 +618,7 @@ export const SidebarSettings: React.FC<SidebarSettingsProps> = ({
                     }}
                   />
                 </label>
-                <p className="text-[10px] text-slate-500">
-                  Ayrıca kart listesinden her kartın kendi arka yüzünü tek tek de değiştirebilirsiniz.
-                </p>
+                <p className="text-[10px] text-slate-500">{t('individualBackNote')}</p>
               </div>
             )}
           </div>

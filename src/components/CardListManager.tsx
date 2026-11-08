@@ -7,6 +7,7 @@ import {
   UploadCloud,
 } from 'lucide-react';
 import React, { useRef, useState } from 'react';
+import { useI18n } from '../i18n/LanguageContext';
 import type { BackMode, CardItem } from '../types/pnp';
 
 interface CardListManagerProps {
@@ -30,6 +31,7 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
   onReorderCards,
   onSetAllCopies,
 }) => {
+  const { t } = useI18n();
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -53,7 +55,7 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
             className="flex items-center gap-2 px-3.5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg text-xs font-semibold shadow-md shadow-indigo-600/20 transition cursor-pointer"
           >
             <UploadCloud className="w-4 h-4" />
-            <span>Toplu Kart Ekle</span>
+            <span>{t('addBatchCards')}</span>
           </button>
           <input
             ref={fileInputRef}
@@ -70,34 +72,34 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
           />
 
           <span className="text-xs text-slate-400">
-            <strong className="text-white font-medium">{cards.length}</strong> kart türü /{' '}
-            <strong className="text-indigo-400 font-medium">{totalCopies}</strong> toplam baskı kartı
+            <strong className="text-white font-medium">{cards.length}</strong> {t('cardTypesCount')} /{' '}
+            <strong className="text-indigo-400 font-medium">{totalCopies}</strong> {t('totalPrintCards')}
           </span>
         </div>
 
         {cards.length > 0 && (
           <div className="flex items-center gap-2 text-xs">
-            <span className="text-slate-400 text-[11px]">Hızlı Adet:</span>
+            <span className="text-slate-400 text-[11px]">{t('quickCopies')}</span>
             <button
               onClick={() => onSetAllCopies(1)}
-              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/60 text-[11px]"
-              title="Tüm kartların adedini 1 yap"
+              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/60 text-[11px] cursor-pointer"
+              title="1x"
             >
-              Hepsi 1x
+              {t('all1x')}
             </button>
             <button
               onClick={() => onSetAllCopies(2)}
-              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/60 text-[11px]"
-              title="Tüm kartların adedini 2 yap"
+              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/60 text-[11px] cursor-pointer"
+              title="2x"
             >
-              Hepsi 2x
+              {t('all2x')}
             </button>
             <button
               onClick={() => onSetAllCopies(4)}
-              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/60 text-[11px]"
-              title="Tüm kartların adedini 4 yap"
+              className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded border border-slate-700/60 text-[11px] cursor-pointer"
+              title="4x"
             >
-              Hepsi 4x
+              {t('all4x')}
             </button>
           </div>
         )}
@@ -123,13 +125,12 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
             <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4 group-hover:scale-110 transition">
               <UploadCloud className="w-8 h-8 text-indigo-400" />
             </div>
-            <h3 className="text-base font-semibold text-white mb-1">Ön Yüz Kart Görsellerini Yükleyin</h3>
+            <h3 className="text-base font-semibold text-white mb-1">{t('dropzoneTitle')}</h3>
             <p className="text-xs text-slate-400 max-w-sm mb-4 leading-relaxed">
-              Kart dosyalarınızı (PNG, JPG, WebP) buraya sürükleyip bırakın veya seçmek için tıklayın.
-              Toplu olarak onlarca kartı tek seferde ekleyebilirsiniz.
+              {t('dropzoneDesc')}
             </p>
             <span className="px-4 py-2 bg-indigo-600/30 border border-indigo-500/40 text-indigo-300 text-xs font-medium rounded-lg">
-              Dosyaları Seç
+              {t('selectFiles')}
             </span>
           </div>
         ) : (
@@ -159,7 +160,7 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
                     {activeBack && (
                       <div
                         className="absolute top-1.5 right-1.5 w-6 h-8 rounded border border-indigo-400/60 overflow-hidden shadow-md bg-slate-900"
-                        title="Arka yüz"
+                        title={t('backTitle')}
                       >
                         <img src={activeBack} alt="Back" className="w-full h-full object-cover" />
                       </div>
@@ -171,23 +172,23 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
                         <button
                           onClick={() => index > 0 && onReorderCards(index, index - 1)}
                           disabled={index === 0}
-                          className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                          title="Sola taşı"
+                          className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                          title={t('moveLeft')}
                         >
                           <ArrowLeft className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => onDeleteCard(card.id)}
-                          className="p-1 rounded bg-red-950/80 hover:bg-red-800 text-red-300"
-                          title="Kartı sil"
+                          className="p-1 rounded bg-red-950/80 hover:bg-red-800 text-red-300 cursor-pointer"
+                          title={t('deleteCard')}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
                         <button
                           onClick={() => index < cards.length - 1 && onReorderCards(index, index + 1)}
                           disabled={index === cards.length - 1}
-                          className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed"
-                          title="Sağa taşı"
+                          className="p-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer"
+                          title={t('moveRight')}
                         >
                           <ArrowRight className="w-3.5 h-3.5" />
                         </button>
@@ -195,18 +196,22 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
 
                       <div className="flex flex-col gap-1.5">
                         <label className="w-full py-1 bg-indigo-600 hover:bg-indigo-500 text-white rounded text-[10px] font-medium text-center cursor-pointer transition">
-                          Önü Değiştir
+                          {t('frontPreviewChange')}
                           <input
                             type="file"
                             accept="image/*"
                             className="hidden"
                             onChange={(e) => {
                               if (e.target.files?.[0]) {
+                                const f = e.target.files[0];
+                                try {
+                                  onUpdateCard(card.id, { frontImage: URL.createObjectURL(f) });
+                                } catch {}
                                 const reader = new FileReader();
                                 reader.onload = () => {
                                   onUpdateCard(card.id, { frontImage: reader.result as string });
                                 };
-                                reader.readAsDataURL(e.target.files[0]);
+                                reader.readAsDataURL(f);
                               }
                             }}
                           />
@@ -214,18 +219,22 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
 
                         {backMode === 'individual' && (
                           <label className="w-full py-1 bg-purple-600 hover:bg-purple-500 text-white rounded text-[10px] font-medium text-center cursor-pointer transition">
-                            Arkayı Değiştir
+                            {t('backPreviewChange')}
                             <input
                               type="file"
                               accept="image/*"
                               className="hidden"
                               onChange={(e) => {
                                 if (e.target.files?.[0]) {
+                                  const f = e.target.files[0];
+                                  try {
+                                    onUpdateCard(card.id, { backImage: URL.createObjectURL(f) });
+                                  } catch {}
                                   const reader = new FileReader();
                                   reader.onload = () => {
                                     onUpdateCard(card.id, { backImage: reader.result as string });
                                   };
-                                  reader.readAsDataURL(e.target.files[0]);
+                                  reader.readAsDataURL(f);
                                 }
                               }}
                             />
@@ -245,11 +254,11 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
                     />
 
                     <div className="flex items-center justify-between bg-slate-950/80 px-2 py-1 rounded-lg border border-slate-800 text-xs">
-                      <span className="text-[10px] text-slate-400">Adet:</span>
+                      <span className="text-[10px] text-slate-400">{t('cardCopies')}</span>
                       <div className="flex items-center gap-1.5">
                         <button
                           onClick={() => onUpdateCard(card.id, { copies: Math.max(1, (card.copies || 1) - 1) })}
-                          className="w-5 h-5 rounded flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300"
+                          className="w-5 h-5 rounded flex items-center justify-center bg-slate-800 hover:bg-slate-700 text-slate-300 cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
@@ -258,7 +267,7 @@ export const CardListManager: React.FC<CardListManagerProps> = ({
                         </span>
                         <button
                           onClick={() => onUpdateCard(card.id, { copies: (card.copies || 1) + 1 })}
-                          className="w-5 h-5 rounded flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white"
+                          className="w-5 h-5 rounded flex items-center justify-center bg-indigo-600 hover:bg-indigo-500 text-white cursor-pointer"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
