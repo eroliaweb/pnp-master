@@ -80,7 +80,7 @@ Ev yazıcılarında veya ozalitçilerde arkalı önlü kart basarken, standart a
 
 ### Kurulum
 ```bash
-git clone https://github.com/kullanici-adiniz/pnpmaster.git
+git clone https://github.com/eroliaweb/pnp-master.git
 cd pnpmaster
 npm install
 ```
