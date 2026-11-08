@@ -97,7 +97,7 @@ PNPMaster provides a high-performance desktop studio where you can drop your car
 ### Installation
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/pnpmaster.git
+git clone https://github.com/eroliaweb/pnp-master.git
 cd pnpmaster
 
 # Install dependencies
