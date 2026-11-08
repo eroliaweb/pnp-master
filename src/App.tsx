@@ -117,25 +117,39 @@ export const App: React.FC = () => {
 
   // Handlers for cards
   const handleAddCards = (files: FileList) => {
-    const newItems: CardItem[] = [];
-    let loadedCount = 0;
+    const fileList = Array.from(files);
+    if (!fileList.length) return;
 
-    Array.from(files).forEach((file, index) => {
+    // Instant synchronous card creation using URL.createObjectURL
+    const newItems: CardItem[] = fileList.map((file, index) => {
+      const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+      let initialUrl = '';
+      try {
+        initialUrl = URL.createObjectURL(file);
+      } catch (err) {
+        console.warn('URL.createObjectURL failed:', err);
+      }
+
+      return {
+        id: `card-${Date.now()}-${Math.random().toString(36).substring(2, 7)}-${index}`,
+        name: cleanName,
+        frontImage: initialUrl,
+        copies: 1,
+      };
+    });
+
+    // Cards appear immediately on screen without delay!
+    setCards((prev) => [...prev, ...newItems]);
+
+    // Also read base64 in background for persistent storage & PDF rendering
+    fileList.forEach((file, index) => {
       const reader = new FileReader();
       reader.onload = () => {
-        // Strip extension from file name
-        const cleanName = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
-
-        newItems.push({
-          id: `card-${Date.now()}-${Math.random().toString(36).substring(2, 7)}-${index}`,
-          name: cleanName,
-          frontImage: reader.result as string,
-          copies: 1,
-        });
-
-        loadedCount++;
-        if (loadedCount === files.length) {
-          setCards((prev) => [...prev, ...newItems]);
+        if (reader.result) {
+          const cardId = newItems[index].id;
+          setCards((prev) =>
+            prev.map((c) => (c.id === cardId ? { ...c, frontImage: reader.result as string } : c))
+          );
         }
       };
       reader.readAsDataURL(file);
@@ -143,21 +157,36 @@ export const App: React.FC = () => {
   };
 
   const handleBatchBackUpload = (files: FileList) => {
-    const backUrls: string[] = [];
-    let loadedCount = 0;
+    const fileList = Array.from(files);
+    if (!fileList.length) return;
 
-    Array.from(files).forEach((file) => {
+    const instantBackUrls = fileList.map((f) => {
+      try {
+        return URL.createObjectURL(f);
+      } catch {
+        return '';
+      }
+    });
+
+    // Assign backs immediately
+    setCards((prev) =>
+      prev.map((c, idx) => ({
+        ...c,
+        backImage: instantBackUrls[idx % instantBackUrls.length] || c.backImage,
+      }))
+    );
+
+    // Read base64 in background
+    fileList.forEach((file, fileIdx) => {
       const reader = new FileReader();
       reader.onload = () => {
-        backUrls.push(reader.result as string);
-        loadedCount++;
-        if (loadedCount === files.length) {
-          // Assign backs sequentially to existing cards
+        if (reader.result) {
           setCards((prev) =>
-            prev.map((c, idx) => ({
-              ...c,
-              backImage: backUrls[idx % backUrls.length] || c.backImage,
-            }))
+            prev.map((c, cardIdx) =>
+              cardIdx % fileList.length === fileIdx
+                ? { ...c, backImage: reader.result as string }
+                : c
+            )
           );
         }
       };

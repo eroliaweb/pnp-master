@@ -1,5 +1,11 @@
 const { app, BrowserWindow, Menu, shell } = require('electron');
 const path = require('path');
+const os = require('os');
+
+// Redirect user data and cache away from OneDrive to prevent access denied errors
+const tempUserData = path.join(os.tmpdir(), 'pnpmaster-electron-data');
+app.setPath('userData', tempUserData);
+app.commandLine.appendSwitch('disable-gpu-shader-disk-cache');
 
 let mainWindow = null;
 

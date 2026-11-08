@@ -3,5 +3,5 @@ title PNPMaster - Print & Play Kart Baski Studyosu
 cd /d "%~dp0"
 
 echo PNPMaster aciliyor...
-start "" npx electron .
+start "" ".\node_modules\.bin\electron.cmd" .
 exit
